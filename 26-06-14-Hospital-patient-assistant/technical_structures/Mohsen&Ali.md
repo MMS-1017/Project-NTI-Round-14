@@ -1,89 +1,251 @@
-# Extracted Tech Stack
+# Technical Approach – Agentic Medical System
 
-# Recommended Tech Stack
+Framework: LangGraph + FastAPI
 
-## Frontend
+## 1- Orchestrator Agent
 
-- Vue.js
-- Tailwind CSS
+Function:
+Acts as the central coordinator and the only agent that communicates directly with patients.
+Responsible for authentication, session management, query understanding, and routing requests to the appropriate agent.
 
-## Backend
+Input:
+- Patient Profile
+- Medical History
+- Patient Query (Text / Voice / Image)
 
-- FastAPI
-- Python
+Output:
+- Routes request to Scheduling Agent, Diagnosis Agent, Emergency Agent, or Feedback Agent
+- Returns final response to patient
 
-## Agent Framework
+Tools:
+- Patient Database
+- Session Management Service
 
-- LangGraph
+Model:
+- Gemini Flash 2.5
 
-## LLM Provider
+---
 
-Primary:
+## 2- Scheduling Agent
 
-- NVIDIA NIM API
+Function:
+Handles appointment booking and clinic availability checks.
+Manages loyalty points and applies eligible offers during payment.
 
-Fallback:
+Input:
+- Orchestrator Output
+- Appointment Request
+- Department Recommendation
 
-- OpenRouter
+Output:
+- Available Appointment Slots
+- Booking Confirmation
+- Loyalty Information
 
-## Models
+Tools:
+- Doctor Database (Read)
+- Appointment Database (Read / Write)
+- add_points()
+- check_available_offers()
 
-Diagnosis Agent
+Model:
+- Llama 3.2
 
-- Qwen 3
+---
 
-Orchestrator Agent
+## 3- Diagnosis Agent
 
-- Qwen 3
+Function:
+Analyzes patient symptoms and medical data to determine the most appropriate department and urgency level.
 
-Scheduling Agent
+Input:
+- Patient Complaint (Text / Voice / Image)
+- Medical History
 
-- Qwen 3
+Output:
+- Department Classification
+- Confidence Score
+- Urgency Score
+- Recommendation to Scheduling Agent or Emergency Agent
 
-Feedback Agent
+Tools:
+- Medical RAG System
+- Vector Database (Qdrant)
+- Medical Knowledge Base
 
-- Qwen 3
+Model:
+- Qwen2.5-VL (for image understanding)
 
-Emergency Agent
+---
 
-- Qwen 3
+## 4- Emergency Agent
 
-## Multimodal Models
+Function:
+Handles urgent and life-threatening situations.
+Determines ambulance requirements and generates emergency alerts.
 
-- Qwen2.5-VL
+Input:
+- Diagnosis Agent Output
+- Patient Risk Profile
 
-## Speech-to-Text
+Output:
+- Emergency Alert
+- Ambulance Recommendation
+- Hospital Notification
 
-- Whisper Large V3
+Tools:
+- Emergency Rules Engine
+- Patient History Database
 
-## Text-to-Speech
+Model:
+- Llama 3.2
 
-MVP:
+---
 
-- Kokoro TTS
+## 5- Feedback Agent
 
-Future Enhancement:
+Function:
+Collects patient feedback after appointments and stores insights for analytics and future model improvements.
 
-- Arabic / Egyptian Arabic TTS Provider
+Input:
+- Completed Appointment Information
 
-## Vector Database
+Output:
+- Satisfaction Score
+- Complaint Records
+- Patient Health Status Updates
 
-- Qdrant
+Tools:
+- Analytics Database
+- Feedback Database
 
-## Relational Database
+Model:
+- Qwen 0.5
 
-- PostgreSQL
+---
 
-## Task Scheduling
+## Supporting Services
 
-- Cron Jobs
+### Medical RAG Service
 
-## Monitoring
+Function:
+Provides medical knowledge retrieval for the Diagnosis Agent.
 
-- Langfuse
+Components:
+- Document Ingestion Pipeline
+- Embedding Model
+- Qdrant Vector Database
+- Retrieval Layer
 
-## Notifications
+Output:
+- Relevant Medical Context
 
+---
+
+### Notification Service
+
+Function:
+Sends notifications to patients.
+
+Used For:
+- Appointment Reminders
+- Medication Reminders
+- Feedback Requests
+- Emergency Alerts
+
+Channel:
 - Telegram Bot API
 
 ---
+
+### Medication Reminder Service
+
+Function:
+Automatically schedules medication reminders after prescriptions are stored.
+
+Input:
+- Prescription Data
+
+Output:
+- Reminder Notifications
+
+Tools:
+- PostgreSQL
+- Cron Jobs
+- Telegram Bot API
+
+---
+
+## Databases
+
+### Patient Database
+
+Stores:
+- Patient Profiles
+- Medical History
+- Loyalty Points
+- Previous Diagnoses
+
+### Appointment Database
+
+Stores:
+- Doctors
+- Clinics
+- Appointments
+- Availability Slots
+
+### Analytics Database
+
+Stores:
+- Feedback Records
+- KPIs
+- Service Analytics
+
+---
+
+## Monitoring
+
+Tool:
+- Langfuse
+
+Purpose:
+- Agent Tracing
+- Workflow Monitoring
+- Performance Evaluation
+
+---
+
+## Technology Stack
+
+Frontend:
+- Vue.js
+- Tailwind CSS
+
+Backend:
+- FastAPI
+- Python
+
+Agent Framework:
+- LangGraph
+
+Models:
+- Qwen 3
+- Qwen2.5-VL
+
+Speech-to-Text:
+- Whisper Large V3
+
+Text-to-Speech:
+- Kokoro TTS
+
+Vector Database:
+- Qdrant
+
+Relational Database:
+- PostgreSQL
+
+Monitoring:
+- Langfuse
+
+Notifications:
+- Telegram Bot API
